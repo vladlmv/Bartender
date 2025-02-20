@@ -47,34 +47,60 @@
 
 Схема отношений:
 •	USERS (1) → (∞) USER_INGREDIENTS (∞) ← (1) INGREDIENTS
+
 •	COCKTAILS (∞) → (1) CATEGORIES
+
 •	COCKTAILS (∞) ↔ (∞) INGREDIENTS (через COCKTAIL_INGREDIENTS)
 
 3. API схема.
    Аутентификация
+   
 •	POST /api/auth/register/ – Регистрация нового пользователя
+
 •	POST /api/auth/login/ – Вход пользователя
+
 •	POST /api/auth/logout/ – Выход пользователя
+
    Ингредиенты
+   
 •	GET /api/ingredients/ – Получить список всех ингредиентов
+
    Ингредиенты пользователя
+   
 •	GET /api/user-ingredients/ – Получить список ингредиентов текущего пользователя
+
    Коктейли
+   
 •	GET /api/cocktails/ – Получить список всех коктейлей
+
 •	GET /api/cocktails/{id}/ – Получить информацию о конкретном коктейле
+
 •	POST /api/cocktails/ – Добавить новый коктейль (для администраторов)
+
 •	DELETE /api/cocktails/{id}/ – Удалить коктейль (для администраторов)
+
    Поиск коктейлей по ингредиентам
+   
 •	GET /api/cocktails/by-ingredients/ – Получить коктейли, которые можно приготовить из имеющихся ингредиентов пользователя
+
 •	GET /api/cocktails/missing-ingredients/ – Получить коктейли, для которых не хватает ингредиентов, с указанием недостающих продуктов
+
    Категории коктейлей
+   
 •	GET /api/categories/ – Получить список всех категорий
+
 •	GET /api/categories/{id}/ – Получить информацию о конкретной категории
+
 •	POST /api/categories/ – Добавить новую категорию (для администраторов)
+
 •	DELETE /api/categories/{id}/ – Удалить категорию (для администраторов)
 
-4. Используемые технологии
+
+5. Используемые технологии
+   
 Front: HTML + CSS
+
 Back: python, django
+
 БД: PostgresSQL
 
