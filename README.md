@@ -6,9 +6,9 @@
 
 •  ADMINS (администраторы)
 
-•	id (SERIAL, PK) – уникальный идентификатор пользователя
+•	id (SERIAL, PK) – уникальный идентификатор администратора
 
-•	login (VARCHAR(50), UNIQUE, NOT NULL) – имя пользователя
+•	login (VARCHAR(50), UNIQUE, NOT NULL) – имя администратора
 
 •	password (TEXT, NOT NULL) – пароль
 
