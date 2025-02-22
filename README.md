@@ -8,7 +8,7 @@
 
 •	id (SERIAL, PK) – уникальный идентификатор пользователя
 
-•	username (VARCHAR(50), UNIQUE, NOT NULL) – имя пользователя
+•	login (VARCHAR(50), UNIQUE, NOT NULL) – имя пользователя
 
 •	password (TEXT, NOT NULL) – пароль
 
@@ -16,7 +16,7 @@
 
 •	id (SERIAL, PK) – уникальный идентификатор пользователя
 
-•	username (VARCHAR(50), UNIQUE, NOT NULL) – имя пользователя
+•	login (VARCHAR(50), UNIQUE, NOT NULL) – имя пользователя
 
 •	password (TEXT, NOT NULL) – пароль
 
