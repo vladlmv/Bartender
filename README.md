@@ -52,7 +52,8 @@
 
 •	name (VARCHAR(50), UNIQUE, NOT NULL) – название категории
 
- ![image](https://github.com/user-attachments/assets/12c1cd9c-a27e-4a34-8c55-ef1e99471f50)
+ ![image](https://github.com/user-attachments/assets/856339cb-f749-4e33-b004-f7fce981463e)
+
 
 
 Схема отношений:
