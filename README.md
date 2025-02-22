@@ -52,9 +52,17 @@
 
 •	name (VARCHAR(50), UNIQUE, NOT NULL) – название категории
 
- ![image](https://github.com/user-attachments/assets/a80320cc-3901-4950-a7e0-0edf68f2589c)
+ ![image](https://github.com/user-attachments/assets/12c1cd9c-a27e-4a34-8c55-ef1e99471f50)
+
 
 Схема отношений:
+
+•	ADMINS (1) → (∞) INGREDIENTS
+
+•	ADMINS (1) → (∞) CATEGORIES
+
+•	ADMINS (1) → (∞) COCKTAILS
+
 •	USERS (1) → (∞) USER_INGREDIENTS (∞) ← (1) INGREDIENTS
 
 •	COCKTAILS (∞) → (1) CATEGORIES
@@ -77,6 +85,11 @@
    Ингредиенты пользователя
    
 •	GET /api/user-ingredients/ – Получить список ингредиентов текущего пользователя
+
+•	POST /api/user-ingredients/ – Добавить новый ингредиент
+
+•	DELETE /api/user-ingredients/ – Удалить ингредиент
+
 
    Коктейли
    
@@ -107,7 +120,7 @@
 
 5. Используемые технологии
    
-Front: HTML + CSS
+Front: HTML + CSS, django AlpineJS
 
 Back: python, django
 
