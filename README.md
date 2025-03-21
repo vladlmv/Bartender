@@ -34,6 +34,15 @@
 
 •	name (VARCHAR(100), UNIQUE, NOT NULL) – название ингредиента
 
+•  COCKTAIL_INGREDIENTS (ингредиенты для коктейля)
+
+•	id (SERIAL, PK) – уникальный идентификатор администратора
+
+•	cocktail_id (VARCHAR(50), UNIQUE, NOT NULL) – идентификатор коктейля
+
+•	ingredient_id (TEXT, NOT NULL) – идентификатор ингредиента
+
+
 •  COCKTAILS (коктейли)
 
 •	id (SERIAL, PK) – уникальный идентификатор коктейля
@@ -51,6 +60,15 @@
 •	id (SERIAL, PK) – уникальный идентификатор
 
 •	name (VARCHAR(50), UNIQUE, NOT NULL) – название категории
+
+•  COCKTAILS_INGREDIENTS (Ингредиенты коктейля)
+
+•	id (SERIAL, PK) – уникальный идентификатор 
+
+•	cocktail_id (INTEGER, FK → COCKTAILS.id, ON DELETE CASCADE) – связь с коктейлем
+
+•	ingredient_id (INTEGER, FK → INGREDIENTS.id, ON DELETE CASCADE) – связь с ингредиентом
+
 
  ![image](https://github.com/user-attachments/assets/856339cb-f749-4e33-b004-f7fce981463e)
 
@@ -117,6 +135,15 @@
 •	POST /api/categories/ – Добавить новую категорию (для администраторов)
 
 •	DELETE /api/categories/{id}/ – Удалить категорию (для администраторов)
+
+ Ингредиенты коктейля
+ 
+•	GET /api/cocktails-ingredients/{cocktail_id} – Получить список ингредиентов для конкретного коктейля
+
+•	POST /api/cocktails-ingredients/ – Добавить ингредиент в коктейль (для администраторов)
+
+•	DELETE /api/cocktails-ingredients/{cocktail_id}/{ ingredient_id }– Удалить ингредиент из коктейля (для администраторов)
+
 
 
 5. Используемые технологии
