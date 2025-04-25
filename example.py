@@ -32,7 +32,7 @@ with open('data.json', 'w') as file:
     json.dump(data_to_save, file, indent=4)
 
 # Подключение к базе данных
-engine = create_engine('postgresql://postgres:zolozz@localhost/labs')
+engine = create_engine('postgresql://postgres:1928@localhost/postgres')
 Base.metadata.create_all(engine)
 
 Session = sessionmaker(bind=engine)

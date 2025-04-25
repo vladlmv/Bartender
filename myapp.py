@@ -34,6 +34,7 @@ class Ingredient(Base):
 
     user_ingredients = relationship("UserIngredient", back_populates="ingredient")
     cocktails = relationship("Cocktail", back_populates="ingredient")
+    cocktail_ingredients = relationship("CocktailIngredient", back_populates="ingredient")
 
 
 class UserIngredient(Base):
@@ -68,6 +69,10 @@ class Cocktail(Base):
     category = relationship("Category", back_populates="cocktails")
     ingredient = relationship("Ingredient", back_populates="cocktails")
 
+    # исправлено здесь
+    cocktail_ingredients = relationship('CocktailIngredient', back_populates='cocktail')
+
+
 class CocktailIngredient(Base):
     __tablename__ = 'cocktail_ingredients'
 
@@ -75,5 +80,6 @@ class CocktailIngredient(Base):
     cocktail_id = Column(Integer, ForeignKey('cocktails.id', ondelete='CASCADE'), nullable=False)
     ingredient_id = Column(Integer, ForeignKey('ingredients.id', ondelete='CASCADE'), nullable=False)
 
+    # должно совпадать с 'cocktail_ingredients' выше
     cocktail = relationship("Cocktail", back_populates="cocktail_ingredients")
     ingredient = relationship("Ingredient", back_populates="cocktail_ingredients")
