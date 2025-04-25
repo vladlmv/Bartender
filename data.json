@@ -1,0 +1,59 @@
+{
+    "users": [
+        {
+            "user_id": 1,
+            "login": "john_doe",
+            "password": "password123"
+        },
+        {
+            "user_id": 2,
+            "login": "jane_doe",
+            "password": "password456"
+        }
+    ],
+    "ingredients": [
+        {
+            "ingredient_id": 1,
+            "name": "vodka"
+        },
+        {
+            "ingredient_id": 2,
+            "name": "lime"
+        },
+        {
+            "ingredient_id": 3,
+            "name": "mint"
+        }
+    ],
+    "cocktails": [
+        {
+            "cocktail_id": 1,
+            "name": "Mojito",
+            "category_id": 1,
+            "instructions": "Mix vodka, lime, mint with ice."
+        },
+        {
+            "cocktail_id": 2,
+            "name": "Bloody Mary",
+            "category_id": 2,
+            "instructions": "Mix vodka, lime, and spices."
+        }
+    ],
+    "categories": [
+        {
+            "category_id": 1,
+            "name": "Classic Cocktails"
+        },
+        {
+            "category_id": 2,
+            "name": "Spicy Cocktails"
+        }
+    ],
+    "admins": [
+        {
+            "admin_id": 1,
+            "login": "admin",
+            "password": "adminpass"
+        }
+    ]
+}
