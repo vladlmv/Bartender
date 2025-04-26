@@ -3,106 +3,128 @@ from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 from myapp import Base, Admin, User, Ingredient, Category, Cocktail, UserIngredient, CocktailIngredient
 
-# Пример данных для записи в JSON-файл
+# Данные для JSON и базы
 data_to_save = {
     "users": [
-        {"user_id": 1, "login": "john_doe", "password": "password123"},
-        {"user_id": 2, "login": "jane_doe", "password": "password456"}
+        {"login": "john_doe", "password": "password123"},
+        {"login": "jane_doe", "password": "password456"}
     ],
     "ingredients": [
-        {"ingredient_id": 1, "name": "vodka"},
-        {"ingredient_id": 2, "name": "lime"},
-        {"ingredient_id": 3, "name": "mint"}
+        {"name": "vodka"},
+        {"name": "lime"},
+        {"name": "mint"}
     ],
     "cocktails": [
-        {"cocktail_id": 1, "name": "Mojito", "category_id": 1, "instructions": "Mix vodka, lime, mint with ice."},
-        {"cocktail_id": 2, "name": "Bloody Mary", "category_id": 2, "instructions": "Mix vodka, lime, and spices."}
+        {"name": "Mojito", "category": "Classic Cocktails", "instructions": "Mix vodka, lime, mint with ice."},
+        {"name": "Bloody Mary", "category": "Spicy Cocktails", "instructions": "Mix vodka, lime, and spices."}
     ],
     "categories": [
-        {"category_id": 1, "name": "Classic Cocktails"},
-        {"category_id": 2, "name": "Spicy Cocktails"}
+        {"name": "Classic Cocktails"},
+        {"name": "Spicy Cocktails"}
     ],
     "admins": [
-        {"admin_id": 1, "login": "admin", "password": "adminpass"}
+        {"login": "admin5", "password": "adminpass"}
     ]
 }
 
-# Запись данных в JSON-файл
+# Сохраняем данные в JSON
 with open('data.json', 'w') as file:
     json.dump(data_to_save, file, indent=4)
 
-# Подключение к базе данных
+# Подключение к БД
 engine = create_engine('postgresql://postgres:1928@localhost/postgres')
 Base.metadata.create_all(engine)
 
 Session = sessionmaker(bind=engine)
 session = Session()
 
-# Создание тестового администратора
-admin1 = Admin(login='admin', password='adminpass')
-session.add(admin1)
+try:
+    # Создание администратора
+    for admin_data in data_to_save['admins']:
+        existing_admin = session.query(Admin).filter_by(login=admin_data['login']).first()
+        if not existing_admin:
+            admin = Admin(**admin_data)
+            session.add(admin)
+            print(f"Админ '{admin_data['login']}' создан.")
+        else:
+            print(f"Админ '{admin_data['login']}' уже существует.")
 
-# Создание пользователей
-user1 = User(login='john_doe', password='password123')
-user2 = User(login='jane_doe', password='password456')
-session.add_all([user1, user2])
-session.flush()  # Чтобы присвоились id
+    # Создание пользователей
+    users = []
+    for user_data in data_to_save['users']:
+        user = session.query(User).filter_by(login=user_data['login']).first()
+        if not user:
+            user = User(**user_data)
+            session.add(user)
+        users.append(user)
+    session.flush()
 
-# Создание ингредиентов
-ingredient1 = Ingredient(name='vodka')
-ingredient2 = Ingredient(name='lime')
-ingredient3 = Ingredient(name='mint')
-session.add_all([ingredient1, ingredient2, ingredient3])
-session.flush()
+    # Создание ингредиентов
+    ingredients = []
+    for ingredient_data in data_to_save['ingredients']:
+        ingredient = session.query(Ingredient).filter_by(name=ingredient_data['name']).first()
+        if not ingredient:
+            ingredient = Ingredient(**ingredient_data)
+            session.add(ingredient)
+        ingredients.append(ingredient)
+    session.flush()
 
-# Добавление UserIngredients
-user_ingredient1 = UserIngredient(user_id=user1.id, ingredient_id=ingredient1.id)
-user_ingredient2 = UserIngredient(user_id=user1.id, ingredient_id=ingredient3.id)
-user_ingredient3 = UserIngredient(user_id=user2.id, ingredient_id=ingredient2.id)
-session.add_all([user_ingredient1, user_ingredient2, user_ingredient3])
+    # Создание категорий
+    categories = []
+    for category_data in data_to_save['categories']:
+        category = session.query(Category).filter_by(name=category_data['name']).first()
+        if not category:
+            category = Category(**category_data)
+            session.add(category)
+        categories.append(category)
+    session.flush()
 
-# Создание категорий
-category1 = Category(name='Classic Cocktails')
-category2 = Category(name='Spicy Cocktails')
-session.add_all([category1, category2])
-session.flush()
+    # Создание коктейлей
+    cocktails = []
+    for cocktail_data in data_to_save['cocktails']:
+        category = session.query(Category).filter_by(name=cocktail_data['category']).first()
+        cocktail = session.query(Cocktail).filter_by(name=cocktail_data['name']).first()
+        if not cocktail:
+            cocktail = Cocktail(
+                name=cocktail_data['name'],
+                category_id=category.id,
+                instructions=cocktail_data['instructions']
+            )
+            session.add(cocktail)
+        cocktails.append(cocktail)
+    session.flush()
 
-# Создание коктейлей
-cocktail1 = Cocktail(name='Mojito', category_id=category1.id, instructions='Mix vodka, lime, mint with ice.')
-cocktail2 = Cocktail(name='Bloody Mary', category_id=category2.id, instructions='Mix vodka, lime, and spices.')
-session.add_all([cocktail1, cocktail2])
-session.flush()
+    # Привязка UserIngredient
+    user_ingredient_data = [
+        (users[0], ingredients[0]),  # john_doe - vodka
+        (users[0], ingredients[2]),  # john_doe - mint
+        (users[1], ingredients[1])   # jane_doe - lime
+    ]
+    for user, ingredient in user_ingredient_data:
+        link = session.query(UserIngredient).filter_by(user_id=user.id, ingredient_id=ingredient.id).first()
+        if not link:
+            session.add(UserIngredient(user_id=user.id, ingredient_id=ingredient.id))
 
-# Связи CocktailIngredient
-cocktail_ingredient1 = CocktailIngredient(cocktail_id=cocktail1.id, ingredient_id=ingredient1.id)  # vodka
-cocktail_ingredient2 = CocktailIngredient(cocktail_id=cocktail1.id, ingredient_id=ingredient2.id)  # lime
-cocktail_ingredient3 = CocktailIngredient(cocktail_id=cocktail1.id, ingredient_id=ingredient3.id)  # mint
-cocktail_ingredient4 = CocktailIngredient(cocktail_id=cocktail2.id, ingredient_id=ingredient1.id)  # vodka
-cocktail_ingredient5 = CocktailIngredient(cocktail_id=cocktail2.id, ingredient_id=ingredient2.id)  # lime
-session.add_all([
-    cocktail_ingredient1, cocktail_ingredient2, cocktail_ingredient3,
-    cocktail_ingredient4, cocktail_ingredient5
-])
+    # Привязка CocktailIngredient
+    cocktail_ingredient_data = [
+        (cocktails[0], ingredients[0]),  # Mojito - vodka
+        (cocktails[0], ingredients[1]),  # Mojito - lime
+        (cocktails[0], ingredients[2]),  # Mojito - mint
+        (cocktails[1], ingredients[0]),  # Bloody Mary - vodka
+        (cocktails[1], ingredients[1])   # Bloody Mary - lime
+    ]
+    for cocktail, ingredient in cocktail_ingredient_data:
+        link = session.query(CocktailIngredient).filter_by(cocktail_id=cocktail.id, ingredient_id=ingredient.id).first()
+        if not link:
+            session.add(CocktailIngredient(cocktail_id=cocktail.id, ingredient_id=ingredient.id))
 
-# Вывод информации
-print("\n--- Users ---")
-for user in session.query(User).all():
-    print(f'User ID: {user.id}, Login: {user.login}')
+    # Сохраняем
+    session.commit()
+    print("\n✅ Все тестовые данные успешно добавлены в базу данных.")
 
-print("\n--- Ingredients ---")
-for ingredient in session.query(Ingredient).all():
-    print(f'Ingredient ID: {ingredient.id}, Name: {ingredient.name}')
+except Exception as e:
+    session.rollback()
+    print(f"\n❌ Ошибка при добавлении данных: {e}")
 
-print("\n--- Cocktails ---")
-for cocktail in session.query(Cocktail).all():
-    print(f'Cocktail ID: {cocktail.id}, Name: {cocktail.name}, Instructions: {cocktail.instructions}')
-
-print("\n--- Admins ---")
-for admin in session.query(Admin).all():
-    print(f'Admin ID: {admin.id}, Login: {admin.login}')
-
-# Сохранение и завершение сессии
-session.commit()
-session.close()
-
-print("\nТестовые данные успешно добавлены в базу данных.")
+finally:
+    session.close()
