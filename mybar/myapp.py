@@ -1,5 +1,7 @@
+from django.forms import DateTimeField
 from sqlalchemy import Column, Integer, String, Text, ForeignKey, MetaData
 from sqlalchemy.orm import declarative_base, relationship
+from passlib.context import CryptContext  # Импортируем для хеширования
 
 # Создаем объект Metadata
 metadata = MetaData()
@@ -7,23 +9,53 @@ metadata = MetaData()
 # Создаем базовый класс с использованием этого объекта Metadata
 Base = declarative_base(metadata=metadata)
 
+# Создаем объект для хеширования паролей
+pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
+
 
 class Admin(Base):
     __tablename__ = 'admins'
 
     id = Column(Integer, primary_key=True, autoincrement=True)
     login = Column(String(50), unique=True, nullable=False)
-    password = Column(Text, nullable=False)
+    _password = Column("password", Text, nullable=False)  # Изменили название столбца, чтобы скрыть пароль
+
+    @property
+    def password(self):
+        return self._password
+
+    @password.setter
+    def password(self, password: str):
+        """Хешируем пароль перед установкой."""
+        self._password = pwd_context.hash(password)
+
+    def verify_password(self, password: str) -> bool:
+        """Проверка пароля."""
+        return pwd_context.verify(password, self._password)
 
 
 class User(Base):
     __tablename__ = 'users'
 
     id = Column(Integer, primary_key=True, autoincrement=True)
+    date_registration = Column(String(20), nullable=True)
     login = Column(String(50), unique=True, nullable=False)
-    password = Column(Text, nullable=False)
+    _password = Column("password", Text, nullable=False)  # Изменили название столбца
 
     user_ingredients = relationship("UserIngredient", back_populates="user")
+
+    @property
+    def password(self):
+        return self._password
+
+    @password.setter
+    def password(self, password: str):
+        """Хешируем пароль перед установкой."""
+        self._password = pwd_context.hash(password)
+
+    def verify_password(self, password: str) -> bool:
+        """Проверка пароля."""
+        return pwd_context.verify(password, self._password)
 
 
 class Ingredient(Base):

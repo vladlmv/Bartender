@@ -1,7 +1,7 @@
 import json
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
-from myapp import Base, Admin, User, Ingredient, Category, Cocktail, UserIngredient, CocktailIngredient
+from mybar.myapp import Base, Admin, User, Ingredient, Category, Cocktail, UserIngredient, CocktailIngredient
 
 # Данные для JSON и базы
 data_to_save = {
@@ -23,13 +23,13 @@ data_to_save = {
         {"name": "Spicy Cocktails"}
     ],
     "admins": [
-        {"login": "admin5", "password": "adminpass"}
+        {"login": "admin", "password": "adminpass"}
     ]
 }
 
 # Сохраняем данные в JSON
-with open('data.json', 'w') as file:
-    json.dump(data_to_save, file, indent=4)
+#with open('data.json', 'w') as file:
+    #json.dump(data_to_save, file, indent=4)
 
 # Подключение к БД
 engine = create_engine('postgresql://postgres:1928@localhost/postgres')
