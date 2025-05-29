@@ -2,7 +2,12 @@ from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 import json
 import logging
-from mybar.crud import create_ingredient, get_all_ingredients, delete_ingredient
+from mybar.crud import (
+    create_ingredient,
+    get_all_ingredients,
+    get_ingredient_by_id,  # Новая функция для получения одного ингредиента
+    delete_ingredient
+)
 
 logger = logging.getLogger(__name__)
 
@@ -31,8 +36,18 @@ def ingredients_handler(request):
 
 @csrf_exempt
 def ingredient_detail_handler(request, ingredient_id):
-    """Handle DELETE /api/ingredients/<id>/"""
-    if request.method == 'DELETE':
+    """Handle GET and DELETE /api/ingredients/<id>/"""
+    if request.method == 'GET':
+        try:
+            ingredient = get_ingredient_by_id(ingredient_id)
+            if not ingredient:
+                return JsonResponse({"error": "Ingredient not found"}, status=404)
+            return JsonResponse({"ingredient": ingredient}, status=200)
+        except Exception as e:
+            logger.error(f"GET ingredient detail error: {str(e)}")
+            return JsonResponse({"error": str(e)}, status=500)
+
+    elif request.method == 'DELETE':
         try:
             deleted = delete_ingredient(ingredient_id)
             if not deleted:
@@ -40,4 +55,5 @@ def ingredient_detail_handler(request, ingredient_id):
             return JsonResponse({"message": "Deleted"})
         except Exception as e:
             return JsonResponse({"error": str(e)}, status=400)
+
     return JsonResponse({"error": "Method not allowed"}, status=405)

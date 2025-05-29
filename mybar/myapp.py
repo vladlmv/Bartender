@@ -13,6 +13,10 @@ Base = declarative_base(metadata=metadata)
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
 
+
+
+
+
 class Admin(Base):
     __tablename__ = 'admins'
 

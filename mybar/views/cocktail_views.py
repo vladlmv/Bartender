@@ -4,8 +4,8 @@ import json
 import logging
 from mybar.crud import (
     create_cocktail, get_all_cocktails, get_cocktail, delete_cocktail,
-    get_cocktails_by_user_ingredients, get_cocktails_missing_ingredients
-)
+    get_cocktails_by_user_ingredients, get_cocktails_missing_ingredients,
+    get_cocktails_by_ingredient, get_cocktails_by_category)
 
 logger = logging.getLogger(__name__)
 
@@ -82,5 +82,30 @@ def cocktails_missing_ingredients_handler(request, user_id):
             return JsonResponse({"cocktails": cocktails}, safe=False, status=200)
         except Exception as e:
             logger.error(f"GET cocktails missing ingredients error: {str(e)}")
+            return JsonResponse({"error": str(e)}, status=500)
+    return JsonResponse({"error": "Method not allowed"}, status=405)
+
+# Add this to views.py (cocktail_views)
+@csrf_exempt
+def cocktails_by_single_ingredient_handler(request, ingredient_id):
+    """Handle GET /api/cocktails/by-ingredient/<ingredient_id>/"""
+    if request.method == 'GET':
+        try:
+            cocktails = get_cocktails_by_ingredient(ingredient_id)
+            return JsonResponse({"cocktails": cocktails}, safe=False, status=200)
+        except Exception as e:
+            logger.error(f"GET cocktails by ingredient error: {str(e)}")
+            return JsonResponse({"error": str(e)}, status=500)
+    return JsonResponse({"error": "Method not allowed"}, status=405)
+
+@csrf_exempt
+def cocktails_by_category_handler(request, category_id):
+    """Handle GET /api/cocktails/by-category/<category_id>/"""
+    if request.method == 'GET':
+        try:
+            cocktails = get_cocktails_by_category(category_id)
+            return JsonResponse({"cocktails": cocktails}, safe=False, status=200)
+        except Exception as e:
+            logger.error(f"GET cocktails by category error: {str(e)}")
             return JsonResponse({"error": str(e)}, status=500)
     return JsonResponse({"error": "Method not allowed"}, status=405)

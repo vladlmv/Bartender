@@ -7,6 +7,7 @@ urlpatterns = [
     path('api/auth/register/', auth_views.register_handler),
     path('api/auth/login/', auth_views.login_handler),
     path('api/auth/admin-login/', auth_views.admin_login_handler),
+    path('api/auth/users/', auth_views.get_all_users_handler, name='get-all-users'),
 
     # Ingredient routes
     path('api/ingredients/', ingredient_views.ingredients_handler),  # GET and POST
@@ -24,6 +25,9 @@ urlpatterns = [
     path('api/cocktails/<int:cocktail_id>/', cocktail_views.cocktail_detail_handler),  # GET and DELETE
     path('api/cocktails/by-ingredients/<int:user_id>/', cocktail_views.cocktails_by_ingredients_handler),
     path('api/cocktails/missing-ingredients/<int:user_id>/', cocktail_views.cocktails_missing_ingredients_handler),
+    path('api/cocktails/by-ingredient/<int:ingredient_id>/', cocktail_views.cocktails_by_single_ingredient_handler),
+
+
 
     # Cocktail Ingredient routes
     path('api/cocktails-ingredients/<int:cocktail_id>/', cocktail_ingredient_views.cocktail_ingredients_handler),

@@ -6,26 +6,24 @@ pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
 # Auth CRUD operations
 def register_user(login: str, password: str):
-    """Register a new user"""
+    """Register a new user and return user object"""
     conn = None
     try:
         conn = init_db()
         cursor = conn.cursor()
 
-        # Check if user already exists
         cursor.execute('SELECT 1 FROM "users" WHERE login = %s', (login,))
         if cursor.fetchone():
             raise ValueError("User already exists")
 
-        # Hash password and insert new user
         hashed_password = pwd_context.hash(password)
         cursor.execute(
-            'INSERT INTO "users" (login, password) VALUES (%s, %s) RETURNING id',
+            'INSERT INTO "users" (login, password) VALUES (%s, %s) RETURNING id, login',
             (login, hashed_password)
         )
-        user_id = cursor.fetchone()[0]
+        user_data = cursor.fetchone()
         conn.commit()
-        return user_id
+        return {'id': user_data[0], 'login': user_data[1]}  # Возвращаем словарь с данными
     except Exception as e:
         if conn:
             conn.rollback()
@@ -545,3 +543,113 @@ def delete_cocktail_ingredient(cocktail_id: int, ingredient_id: int):
     finally:
         if conn:
             conn.close()
+
+def get_ingredient_by_id(ingredient_id: int):
+    """Get specific ingredient by ID"""
+    conn = None
+    try:
+        conn = init_db()
+        cursor = conn.cursor()
+
+        cursor.execute('SELECT * FROM "ingredients" WHERE id = %s', (ingredient_id,))
+        columns = [col[0] for col in cursor.description]
+        result = cursor.fetchone()
+        return dict(zip(columns, result)) if result else None
+    except Exception as e:
+        raise e
+    finally:
+        if conn:
+            conn.close()
+
+# Add this function to the Cocktail CRUD operations section
+def get_cocktails_by_ingredient(ingredient_id: int):
+    """Get all cocktails that contain a specific ingredient"""
+    conn = None
+    try:
+        conn = init_db()
+        cursor = conn.cursor()
+
+        cursor.execute("""
+            SELECT c.id, c.name, c.instructions, cat.name as category_name
+            FROM "cocktails" c
+            JOIN "categories" cat ON c.category_id = cat.id
+            WHERE c.id IN (
+                SELECT cocktail_id 
+                FROM "cocktail_ingredients" 
+                WHERE ingredient_id = %s
+            )
+        """, (ingredient_id,))
+
+        columns = [col[0] for col in cursor.description]
+        return [dict(zip(columns, row)) for row in cursor.fetchall()]
+    except Exception as e:
+        raise e
+    finally:
+        if conn:
+            conn.close()
+
+def get_all_users():
+    """Get all users (admin only)"""
+    conn = None
+    try:
+        conn = init_db()
+        cursor = conn.cursor()
+
+        cursor.execute('SELECT id, login FROM "users"')
+        columns = [col[0] for col in cursor.description]
+        return [dict(zip(columns, row)) for row in cursor.fetchall()]
+    except Exception as e:
+        raise e
+    finally:
+        if conn:
+            conn.close()
+
+def get_cocktails_by_category(category_id: int):
+    """Get all cocktails in a specific category"""
+    conn = None
+    try:
+        conn = init_db()
+        cursor = conn.cursor()
+
+        cursor.execute("""
+            SELECT c.id, c.name, c.instructions, cat.name as category_name
+            FROM "cocktails" c
+            JOIN "categories" cat ON c.category_id = cat.id
+            WHERE c.category_id = %s
+        """, (category_id,))
+
+        columns = [col[0] for col in cursor.description]
+        return [dict(zip(columns, row)) for row in cursor.fetchall()]
+    except Exception as e:
+        raise e
+    finally:
+        if conn:
+            conn.close()
+
+# Add this function to the Cocktail CRUD operations section
+def get_cocktails_by_ingredient(ingredient_id: int):
+    """Get all cocktails that contain a specific ingredient"""
+    conn = None
+    try:
+        conn = init_db()
+        cursor = conn.cursor()
+
+        cursor.execute("""
+            SELECT c.id, c.name, c.instructions, cat.name as category_name
+            FROM "cocktails" c
+            JOIN "categories" cat ON c.category_id = cat.id
+            WHERE c.id IN (
+                SELECT cocktail_id 
+                FROM "cocktail_ingredients" 
+                WHERE ingredient_id = %s
+            )
+        """, (ingredient_id,))
+
+        columns = [col[0] for col in cursor.description]
+        return [dict(zip(columns, row)) for row in cursor.fetchall()]
+    except Exception as e:
+        raise e
+    finally:
+        if conn:
+            conn.close()
+

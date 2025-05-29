@@ -2,7 +2,7 @@ from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 import json
 import logging
-from mybar.crud import register_user, verify_user, verify_admin
+from mybar.crud import register_user, verify_user, verify_admin, get_all_users
 
 logger = logging.getLogger(__name__)
 
@@ -50,4 +50,18 @@ def admin_login_handler(request):
         except Exception as e:
             logger.error(f"Admin login error: {str(e)}")
             return JsonResponse({"error": str(e)}, status=400)
+    return JsonResponse({"error": "Method not allowed"}, status=405)
+
+
+@csrf_exempt
+def get_all_users_handler(request):
+    """Handle GET /api/auth/users/ (admin only)"""
+    if request.method == 'GET':
+        try:
+            # В реальном приложении здесь должна быть проверка JWT-токена и прав администратора
+            users = get_all_users()
+            return JsonResponse({"users": users}, safe=False, status=200)
+        except Exception as e:
+            logger.error(f"GET all users error: {str(e)}")
+            return JsonResponse({"error": str(e)}, status=500)
     return JsonResponse({"error": "Method not allowed"}, status=405)
