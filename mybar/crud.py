@@ -59,6 +59,71 @@ def verify_user(login: str, password: str):
         if conn:
             conn.close()
 
+def get_user_hashed_password(user_id: int):
+    """Get the hashed password for a given user ID."""
+    conn = None
+    try:
+        conn = init_db()
+        cursor = conn.cursor()
+        cursor.execute('SELECT password FROM "users" WHERE id = %s', (user_id,))
+        result = cursor.fetchone()
+        return result[0] if result else None
+    except Exception as e:
+        raise e
+    finally:
+        if conn:
+            conn.close()
+
+
+def update_user_password(user_id: int, new_password: str):
+    """Update a user's password in the database."""
+    conn = None
+    try:
+        conn = init_db()
+        cursor = conn.cursor()
+
+        hashed_new_password = pwd_context.hash(new_password)
+        cursor.execute(
+            'UPDATE "users" SET password = %s WHERE id = %s',
+            (hashed_new_password, user_id)
+        )
+        conn.commit()
+        return cursor.rowcount > 0 # Returns True if a row was updated, False otherwise
+    except Exception as e:
+        if conn:
+            conn.rollback()
+        raise e
+    finally:
+        if conn:
+            conn.close()
+
+def add_admin(login: str, password: str): # НОВАЯ ФУНКЦИЯ ДЛЯ ДОБАВЛЕНИЯ АДМИНА
+    """Add a new admin to the database (password will be hashed)."""
+    conn = None
+    try:
+        conn = init_db()
+        cursor = conn.cursor()
+
+        # Проверяем, не существует ли уже администратор с таким логином
+        cursor.execute('SELECT id FROM admins WHERE login = %s', (login,))
+        if cursor.fetchone():
+            raise ValueError(f"Admin with login '{login}' already exists.")
+
+        hashed_password = pwd_context.hash(password)
+        cursor.execute(
+            'INSERT INTO admins (login, password) VALUES (%s, %s) RETURNING id',
+            (login, hashed_password)
+        )
+        admin_id = cursor.fetchone()[0]
+        conn.commit()
+        return admin_id
+    except Exception as e:
+        if conn:
+            conn.rollback()
+        raise e
+    finally:
+        if conn:
+            conn.close()
 
 # Admin CRUD operations
 def verify_admin(login: str, password: str):
@@ -625,31 +690,3 @@ def get_cocktails_by_category(category_id: int):
     finally:
         if conn:
             conn.close()
-
-# Add this function to the Cocktail CRUD operations section
-def get_cocktails_by_ingredient(ingredient_id: int):
-    """Get all cocktails that contain a specific ingredient"""
-    conn = None
-    try:
-        conn = init_db()
-        cursor = conn.cursor()
-
-        cursor.execute("""
-            SELECT c.id, c.name, c.instructions, cat.name as category_name
-            FROM "cocktails" c
-            JOIN "categories" cat ON c.category_id = cat.id
-            WHERE c.id IN (
-                SELECT cocktail_id 
-                FROM "cocktail_ingredients" 
-                WHERE ingredient_id = %s
-            )
-        """, (ingredient_id,))
-
-        columns = [col[0] for col in cursor.description]
-        return [dict(zip(columns, row)) for row in cursor.fetchall()]
-    except Exception as e:
-        raise e
-    finally:
-        if conn:
-            conn.close()
-

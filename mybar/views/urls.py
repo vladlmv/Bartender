@@ -5,9 +5,11 @@ from mybar.views import auth_views, ingredient_views, category_views, cocktail_v
 urlpatterns = [
     # Auth routes
     path('api/auth/register/', auth_views.register_handler),
+    path('api/auth/register-admin/', auth_views.register_admin_handler, name='register-admin'), # НОВЫЙ URL
     path('api/auth/login/', auth_views.login_handler),
     path('api/auth/admin-login/', auth_views.admin_login_handler),
     path('api/auth/users/', auth_views.get_all_users_handler, name='get-all-users'),
+    path('api/auth/change-password/', auth_views.change_password_handler, name='change-password'), # НОВЫЙ URL ДЛЯ СМЕНЫ ПАРОЛЯ
 
     # Ingredient routes
     path('api/ingredients/', ingredient_views.ingredients_handler),  # GET and POST
@@ -33,5 +35,5 @@ urlpatterns = [
     path('api/cocktails-ingredients/<int:cocktail_id>/', cocktail_ingredient_views.cocktail_ingredients_handler),
     # GET and POST
     path('api/cocktails-ingredients/<int:cocktail_id>/<int:ingredient_id>/',
-         cocktail_ingredient_views.cocktail_ingredient_detail_handler),  # DELETE
+              cocktail_ingredient_views.cocktail_ingredient_detail_handler),  # DELETE
 ]
