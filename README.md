@@ -49,6 +49,9 @@ ingredients (INT[] или JSONB, NOT NULL) – список ингредиент
 
 Схема отношений
 
+<img width="1442" height="1066" alt="image" src="https://github.com/user-attachments/assets/fca0563f-fee6-4779-b061-599b63225aca" />
+
+
 USERS (1) → (∞) USER_INGREDIENTS (∞) ← (1) INGREDIENTS
 
 COCKTAILS (∞) → (1) CATEGORIES
