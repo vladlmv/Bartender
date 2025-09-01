@@ -42,37 +42,71 @@ id (SERIAL, PK) – уникальный идентификатор коктей
 name (VARCHAR(100), UNIQUE, NOT NULL) – название коктейля
 
 category_id (INTEGER, FK → CATEGORIES.id, NOT NULL) – категория коктейля
+
 instructions (TEXT) – рецепт приготовления
+
 ingredients (INT[] или JSONB, NOT NULL) – список ингредиентов коктейля (ссылки на INGREDIENTS.id)
+
 Схема отношений
+
 USERS (1) → (∞) USER_INGREDIENTS (∞) ← (1) INGREDIENTS
+
 COCKTAILS (∞) → (1) CATEGORIES
+
 COCKTAILS (∞) ↔ (∞) INGREDIENTS (через поле ingredients)
-5. API схема
+
+3. API схема
+
 Аутентификация
+
 POST /api/auth/register/ – Регистрация нового пользователя
+
 POST /api/auth/login/ – Вход пользователя
+
 POST /api/auth/logout/ – Выход пользователя
+
 Ингредиенты
+
 GET /api/ingredients/ – Получить список всех ингредиентов
+
 Ингредиенты пользователя
+
 GET /api/user-ingredients/ – Получить список ингредиентов текущего пользователя
+
 POST /api/user-ingredients/ – Добавить новый ингредиент
+
 DELETE /api/user-ingredients/ – Удалить ингредиент
+
 Коктейли
+
 GET /api/cocktails/ – Получить список всех коктейлей
+
 GET /api/cocktails/{id}/ – Получить информацию о конкретном коктейле
+
 POST /api/cocktails/ – Добавить новый коктейль (только для админов)
+
 DELETE /api/cocktails/{id}/ – Удалить коктейль (только для админов)
+
 Поиск коктейлей по ингредиентам
+
 GET /api/cocktails/by-ingredients/ – Получить коктейли, которые можно приготовить из имеющихся ингредиентов пользователя
+
 GET /api/cocktails/missing-ingredients/ – Получить коктейли, для которых не хватает ингредиентов, с указанием недостающих
+
 Категории коктейлей
+
 GET /api/categories/ – Получить список всех категорий
+
 GET /api/categories/{id}/ – Получить информацию о конкретной категории
+
 POST /api/categories/ – Добавить новую категорию (только для админов)
+
 DELETE /api/categories/{id}/ – Удалить категорию (только для админов)
+
 6. Используемые технологии
+
 Frontend: HTML, CSS, AlpineJS, Django templates
+
 Backend: Python, Django
+
 БД: PostgreSQL
