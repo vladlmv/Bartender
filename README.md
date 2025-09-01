@@ -103,7 +103,7 @@ POST /api/categories/ – Добавить новую категорию (тол
 
 DELETE /api/categories/{id}/ – Удалить категорию (только для админов)
 
-6. Используемые технологии
+4. Используемые технологии
 
 Frontend: HTML, CSS, AlpineJS, Django templates
 
